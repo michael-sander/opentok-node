@@ -50,6 +50,7 @@
     "underscore": "~1.5.2",
     "request": "^2.34.0",
     "lodash": "^2.4.1",
-    "mocha": "^1.21.3"
+    "mocha": "^1.21.3",
+    "jwt-simple": "^0.2.0"
   }
 }

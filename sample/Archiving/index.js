@@ -4,7 +4,8 @@ var express = require('express'),
 
 // Verify that the API Key and API Secret are defined
 var apiKey = process.env.API_KEY,
-    apiSecret = process.env.API_SECRET;
+    apiSecret = process.env.API_SECRET
+    apiUrl = process.env.API_URL;
 if (!apiKey || !apiSecret) {
   console.log('You must specify API_KEY and API_SECRET environment variables');
   process.exit(1);
@@ -14,11 +15,16 @@ if (!apiKey || !apiSecret) {
 var app = express();
 app.use(express.static(__dirname + '/public'));
 
+var env = {};
+if (apiUrl) {
+  env.apiUrl = apiUrl;
+}
+
 // Initialize OpenTok
-var opentok = new OpenTok(apiKey, apiSecret);
+var opentok = new OpenTok(apiKey, apiSecret, env);
 
 // Create a session and store it in the express app
-opentok.createSession({ mediaMode: 'routed' },function(err, session) {
+opentok.createSession({ mediaMode: 'routed' }, function(err, session) {
   if (err) throw err;
   app.set('sessionId', session.sessionId);
   // We will wait on starting the app until this is done
@@ -79,7 +85,7 @@ app.get('/start', function(req, res) {
     name: 'Node Archiving Sample App'
   }, function(err, archive) {
     if (err) return res.send(500,
-      'Could not start archive for session '+sessionId+'. error='+err.message
+      'Could not start archive for session '+ app.get('sessionId') + '. error='+err.message
     );
     res.json(archive);
   });
@@ -103,7 +109,9 @@ app.get('/delete/:archiveId', function(req, res) {
 
 // Start the express app
 function init() {
-  app.listen(3000, function() {
-    console.log('You\'re app is now ready at http://localhost:3000/');
+  var port = process.env.PORT || 3000;
+
+  app.listen(port, function() {
+    console.log('You\'re app is now ready at http://localhost:' + port + '/');
   });
 }
